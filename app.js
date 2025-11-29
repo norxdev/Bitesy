@@ -1,4 +1,4 @@
-const resultsEl = document.getElementById("results");
+const resultsEl = document.getElementById("results"); 
 const searchBtn = document.getElementById("searchBtn");
 const searchInput = document.getElementById("searchInput");
 const aiBtn = document.getElementById("aiBtn");
