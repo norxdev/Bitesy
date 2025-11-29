@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cookit – Simple Recipe Finder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header>
+    <h1>Cookit</h1>
+    <p>Find recipes fast or ask Cookit for ideas using a natural prompt.</p>
+  </header>
+
+  <section class="search-panel">
+    <div class="search-row">
+      <input id="searchInput" type="text" placeholder="Search by meal name (e.g., chicken, pasta)" />
+      <button id="searchBtn">Search</button>
+    </div>
+
+    <div class="search-row">
+      <input id="aiInput" type="text" placeholder="AI-style prompt (e.g., high-protein chicken dinner)" />
+      <button id="aiBtn" class="secondary">AI Suggest</button>
+    </div>
+  </section>
+
+  <main id="results" class="results"></main>
+
+  <!-- Modal -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal()">Close</button>
+      <div id="recipeDetail"></div>
+    </div>
+  </div>
+
+  <footer>
+    Powered by TheMealDB (free public API). Cookit is ready for GitHub Pages deployment.
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
