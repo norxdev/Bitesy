@@ -11,31 +11,34 @@
     <h1>Bitesy</h1>
   </header>
 
-  <section class="search-section">
-    <input type="text" id="searchInput" placeholder="Search meals by name...">
+  <section class="search">
+    <input type="text" id="searchInput" placeholder="Search for a meal by name...">
     <button id="searchBtn">Search</button>
-    <input type="text" id="aiInput" placeholder="AI prompt (e.g., 'vegetarian pasta')">
-    <button id="aiBtn">AI Recipe</button>
     <button id="randomBtn">Surprise Me!</button>
   </section>
 
   <section class="filters">
-    <select id="categorySelect"></select>
-    <select id="areaSelect"></select>
-    <select id="ingredientSelect"></select>
+    <div>
+      <label>Category:</label>
+      <select id="categorySelect"></select>
+    </div>
+    <div>
+      <label>Area:</label>
+      <select id="areaSelect"></select>
+    </div>
+    <div>
+      <label>Ingredient:</label>
+      <select id="ingredientSelect"></select>
+    </div>
   </section>
 
-  <section id="letterFilters" class="letter-filters"></section>
+  <section id="results" class="results">
+    Loading meals...
+  </section>
 
-  <section id="results" class="results"></section>
-
-  <!-- Recipe Modal -->
-  <div id="modal" class="modal" onclick="closeModal()">
-    <div class="modal-content" onclick="event.stopPropagation()">
-      <span class="close" onclick="closeModal()">&times;</span>
-      <div id="recipeDetail"></div>
-    </div>
-  </div>
+  <section id="mealDetails" class="meal-details">
+    <!-- Selected meal details will appear here -->
+  </section>
 
   <script src="app.js"></script>
 </body>

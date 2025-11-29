@@ -1,176 +1,137 @@
-const resultsEl = document.getElementById("results");
-const searchBtn = document.getElementById("searchBtn");
 const searchInput = document.getElementById("searchInput");
-const aiBtn = document.getElementById("aiBtn");
-const aiInput = document.getElementById("aiInput");
+const searchBtn = document.getElementById("searchBtn");
+const randomBtn = document.getElementById("randomBtn");
+const resultsEl = document.getElementById("results");
+const mealDetailsEl = document.getElementById("mealDetails");
+
 const categorySelect = document.getElementById("categorySelect");
 const areaSelect = document.getElementById("areaSelect");
 const ingredientSelect = document.getElementById("ingredientSelect");
-const letterFiltersEl = document.getElementById("letterFilters");
-const randomBtn = document.getElementById("randomBtn");
-const proxy = "https://api.allorigins.win/raw?url=";
 
-// Letters A-Z
-for (let i = 65; i <= 90; i++) {
-  const letter = String.fromCharCode(i);
-  const btn = document.createElement("button");
-  btn.textContent = letter;
-  btn.addEventListener("click", () => searchByLetter(letter));
-  letterFiltersEl.appendChild(btn);
+// Helper to create dropdown options
+function populateSelect(selectEl, items) {
+  selectEl.innerHTML = `<option value="">-- Select --</option>`;
+  items.forEach(item => {
+    const opt = document.createElement("option");
+    opt.value = item.strCategory || item.strArea || item.strIngredient;
+    opt.textContent = opt.value;
+    selectEl.appendChild(opt);
+  });
 }
 
-// Load filters with proxy
+// Fetch dropdown data
 async function loadFilters() {
   try {
     const [catRes, areaRes, ingRes] = await Promise.all([
-      fetch(proxy + encodeURIComponent("https://www.themealdb.com/api/json/v1/1/categories.php")),
-      fetch(proxy + encodeURIComponent("https://www.themealdb.com/api/json/v1/1/list.php?a=list")),
-      fetch(proxy + encodeURIComponent("https://www.themealdb.com/api/json/v1/1/list.php?i=list"))
+      fetch("https://www.themealdb.com/api/json/v1/1/list.php?c=list"),
+      fetch("https://www.themealdb.com/api/json/v1/1/list.php?a=list"),
+      fetch("https://www.themealdb.com/api/json/v1/1/list.php?i=list")
     ]);
-    const catData = await catRes.json();
-    const areaData = await areaRes.json();
-    const ingData = await ingRes.json();
-
-    categorySelect.innerHTML = "<option value=''>All Categories</option>" + catData.categories.map(c => `<option value="${c.strCategory}">${c.strCategory}</option>`).join("");
-    areaSelect.innerHTML = "<option value=''>All Areas</option>" + areaData.meals.map(a => `<option value="${a.strArea}">${a.strArea}</option>`).join("");
-    ingredientSelect.innerHTML = "<option value=''>All Ingredients</option>" + ingData.meals.map(i => `<option value="${i.strIngredient}">${i.strIngredient}</option>`).join("");
-
-  } catch(err) {
-    console.error(err);
-    categorySelect.innerHTML = "<option>Error</option>";
-    areaSelect.innerHTML = "<option>Error</option>";
-    ingredientSelect.innerHTML = "<option>Error</option>";
+    const [catData, areaData, ingData] = await Promise.all([catRes.json(), areaRes.json(), ingRes.json()]);
+    populateSelect(categorySelect, catData.meals);
+    populateSelect(areaSelect, areaData.meals);
+    populateSelect(ingredientSelect, ingData.meals);
+  } catch (err) {
+    console.error("Error loading filters:", err);
   }
 }
 
-// Search events
-searchBtn.addEventListener("click", () => {
-  const q = searchInput.value.trim();
-  if (q) searchMeals(q);
-});
-
-aiBtn.addEventListener("click", () => {
-  const prompt = aiInput.value.toLowerCase();
-  let keyword = "chicken";
-  if (prompt.includes("beef")) keyword="beef";
-  else if (prompt.includes("vegetarian") || prompt.includes("veggie")) keyword="vegetable";
-  else if (prompt.includes("pasta")) keyword="pasta";
-  else if (prompt.includes("seafood")) keyword="seafood";
-  searchMeals(keyword);
-});
-
-// Random Meal
-randomBtn.addEventListener("click", async () => {
-  resultsEl.innerHTML = "Loading...";
-  try {
-    const res = await fetch("https://www.themealdb.com/api/json/v1/1/random.php");
-    const data = await res.json();
-    displayMeals(data.meals);
-  } catch(err) {
-    console.error(err);
-    resultsEl.innerHTML = "Error loading meal.";
-  }
-});
-
-// Dropdown filters
-[categorySelect, areaSelect, ingredientSelect].forEach(sel => {
-  sel.addEventListener("change", () => {
-    filterMeals(categorySelect.value, areaSelect.value, ingredientSelect.value);
-  });
-});
-
-// API calls
+// Fetch meals by name
 async function searchMeals(query) {
   resultsEl.innerHTML = "Loading...";
+  mealDetailsEl.innerHTML = "";
   try {
-    const res = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(query)}`);
+    const res = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${query}`);
+    const data = await res.json();
+    displayMeals(data.meals || []);
+  } catch (err) {
+    console.error("Error searching meals:", err);
+    resultsEl.innerHTML = "Failed to load meals.";
+  }
+}
+
+// Fetch random meal
+async function randomMeal() {
+  resultsEl.innerHTML = "Loading...";
+  mealDetailsEl.innerHTML = "";
+  try {
+    const res = await fetch(`https://www.themealdb.com/api/json/v1/1/random.php`);
     const data = await res.json();
     displayMeals(data.meals);
-  } catch(err) {
-    console.error(err);
-    resultsEl.innerHTML = "Error loading meals.";
+  } catch (err) {
+    console.error("Error fetching random meal:", err);
+    resultsEl.innerHTML = "Failed to load meal.";
   }
 }
 
-async function searchByLetter(letter) {
-  resultsEl.innerHTML = "Loading...";
-  try {
-    const res = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?f=${letter}`);
-    const data = await res.json();
-    displayMeals(data.meals);
-  } catch(err) {
-    console.error(err);
-    resultsEl.innerHTML = "Error loading meals.";
-  }
-}
-
-async function filterMeals(category, area, ingredient) {
-  resultsEl.innerHTML = "Loading...";
-  try {
-    let meals = null;
-    if(ingredient) {
-      const res = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${ingredient}`);
-      meals = (await res.json()).meals;
-    } else if(category) {
-      const res = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${category}`);
-      meals = (await res.json()).meals;
-    } else if(area) {
-      const res = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?a=${area}`);
-      meals = (await res.json()).meals;
-    } else {
-      meals = [];
-    }
-    displayMeals(meals);
-  } catch(err) {
-    console.error(err);
-    resultsEl.innerHTML = "Error loading meals.";
-  }
-}
-
-// Display meals
+// Display meals grid
 function displayMeals(meals) {
-  if(!meals) { resultsEl.innerHTML="No results."; return; }
-  resultsEl.innerHTML = meals.map(m => `
-    <div class="card">
-      <img src="${m.strMealThumb}" alt="${m.strMeal}" />
-      <div class="card-body">
-        <h3>${m.strMeal}</h3>
-        <button onclick="openRecipe('${m.idMeal}')">View Recipe</button>
-      </div>
-    </div>
-  `).join("");
+  resultsEl.innerHTML = "";
+  if (meals.length === 0) {
+    resultsEl.innerHTML = "No meals found.";
+    return;
+  }
+  meals.forEach(meal => {
+    const card = document.createElement("div");
+    card.className = "meal-card";
+    card.innerHTML = `
+      <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
+      <h3>${meal.strMeal}</h3>
+    `;
+    card.addEventListener("click", () => showMealDetails(meal.idMeal));
+    resultsEl.appendChild(card);
+  });
 }
 
-// Modal
-async function openRecipe(id) {
-  const modal = document.getElementById("modal");
-  const detail = document.getElementById("recipeDetail");
-  modal.style.display = "flex";
+// Show meal details
+async function showMealDetails(id) {
+  mealDetailsEl.innerHTML = "Loading...";
   try {
     const res = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`);
     const data = await res.json();
     const meal = data.meals[0];
-    let ingredientsHTML = "";
-    for(let i=1;i<=20;i++){
+    const ingredients = [];
+    for (let i = 1; i <= 20; i++) {
       const ing = meal[`strIngredient${i}`];
       const meas = meal[`strMeasure${i}`];
-      if(ing && ing.trim()) ingredientsHTML += `<li>${meas ? meas : ""} ${ing}</li>`;
+      if (ing) ingredients.push(`${meas} ${ing}`);
     }
-    detail.innerHTML = `
+    mealDetailsEl.innerHTML = `
       <h2>${meal.strMeal}</h2>
-      <img src="${meal.strMealThumb}" alt="${meal.strMeal}" style="max-width:100%;border-radius:12px;margin-bottom:12px;">
-      <h3>Ingredients:</h3><ul>${ingredientsHTML}</ul>
-      <h3>Instructions:</h3><p class="instructions">${meal.strInstructions}</p>
-      ${meal.strYoutube ? `<p><a href="${meal.strYoutube}" target="_blank">Watch on YouTube</a></p>` : ""}
+      <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
+      <h3>Ingredients:</h3>
+      <ul>${ingredients.map(i=>`<li>${i}</li>`).join("")}</ul>
+      <h3>Instructions:</h3>
+      <p>${meal.strInstructions}</p>
     `;
-  } catch(err) {
-    console.error(err);
-    detail.innerHTML = "Error loading recipe.";
+  } catch (err) {
+    console.error("Error loading meal details:", err);
+    mealDetailsEl.innerHTML = "Failed to load meal details.";
   }
 }
 
-function closeModal() { document.getElementById("modal").style.display="none"; }
+// Event listeners
+searchBtn.addEventListener("click", () => {
+  const query = searchInput.value.trim();
+  if(query) searchMeals(query);
+});
 
-// Init
+randomBtn.addEventListener("click", randomMeal);
+
+categorySelect.addEventListener("change", () => {
+  const val = categorySelect.value;
+  if(val) searchMeals(val);
+});
+
+areaSelect.addEventListener("change", () => {
+  const val = areaSelect.value;
+  if(val) searchMeals(val);
+});
+
+ingredientSelect.addEventListener("change", () => {
+  const val = ingredientSelect.value;
+  if(val) searchMeals(val);
+});
+
+// Initialize
 loadFilters();
-searchMeals("chicken");
