@@ -19,7 +19,8 @@ function populateSelect(selectEl, items) {
   });
 }
 
-// Fetch dropdown data
+
+// Load dropdown filters
 async function loadFilters() {
   try {
     const [catRes, areaRes, ingRes] = await Promise.all([
@@ -27,12 +28,17 @@ async function loadFilters() {
       fetch("https://www.themealdb.com/api/json/v1/1/list.php?a=list"),
       fetch("https://www.themealdb.com/api/json/v1/1/list.php?i=list")
     ]);
-    const [catData, areaData, ingData] = await Promise.all([catRes.json(), areaRes.json(), ingRes.json()]);
+    const [catData, areaData, ingData] = await Promise.all([
+      catRes.json(),
+      areaRes.json(),
+      ingRes.json()
+    ]);
     populateSelect(categorySelect, catData.meals);
     populateSelect(areaSelect, areaData.meals);
     populateSelect(ingredientSelect, ingData.meals);
   } catch (err) {
     console.error("Error loading filters:", err);
+    resultsEl.innerHTML = "Failed to load filters.";
   }
 }
 
