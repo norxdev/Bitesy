@@ -1,8 +1,9 @@
+/* --- Base --- */
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background: #f8f8f8;
+  background: #fafafa;
   color: #333;
 }
 
@@ -10,29 +11,55 @@ header {
   background: #ff6b6b;
   color: white;
   text-align: center;
-  padding: 1rem 0;
+  padding: 1.2rem 0;
+  font-size: 1.8rem;
+  font-weight: 600;
 }
 
+/* --- Search & Filters --- */
 .search, .filters {
   display: flex;
   justify-content: center;
-  margin: 1rem;
   flex-wrap: wrap;
   gap: 1rem;
+  margin: 1rem;
 }
 
 .search input {
   width: 250px;
-  padding: 0.5rem;
+  padding: 0.5rem 0.6rem;
   font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
 }
 
-.search button {
+.search button, .filters select, #resetBtn {
   padding: 0.5rem 1rem;
   font-size: 1rem;
   cursor: pointer;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: white;
+  transition: all 0.2s;
 }
 
+.search button:hover,
+#resetBtn:hover,
+.filters select:hover {
+  background: #ff6b6b;
+  color: white;
+  border-color: #ff6b6b;
+}
+
+/* --- Results Info --- */
+#resultsInfo {
+  text-align: center;
+  font-style: italic;
+  color: #666;
+  margin: 0.5rem 0 1rem;
+}
+
+/* --- Results Grid --- */
 .results {
   display: flex;
   flex-wrap: wrap;
@@ -43,48 +70,118 @@ header {
 
 .meal-card {
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
   width: 200px;
   text-align: center;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .meal-card:hover {
-  transform: scale(1.05);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
 }
 
 .meal-card img {
   width: 100%;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  object-fit: cover;
 }
 
 .meal-card h3 {
   margin: 0.5rem 0;
   font-size: 1rem;
+  font-weight: 500;
   padding: 0 0.5rem;
+  color: #333;
 }
 
+/* --- Meal Details Full Page --- */
 .meal-details {
-  max-width: 600px;
+  max-width: 700px;
   margin: 2rem auto;
   background: white;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  display: none;
 }
 
 .meal-details img {
   width: 100%;
-  border-radius: 8px;
+  border-radius: 10px;
+  margin-bottom: 1rem;
 }
 
 .meal-details h2 {
-  margin-top: 0.5rem;
+  margin-top: 0;
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.meal-details h3 {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #ff6b6b;
 }
 
 .meal-details ul {
-  padding-left: 1rem;
+  padding-left: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.meal-details ul li {
+  margin-bottom: 0.6rem;
+  line-height: 1.5;
+}
+
+.instructions {
+  padding-left: 1.2rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.instructions li {
+  margin-bottom: 0.8rem;
+  line-height: 1.6;
+}
+
+
+/* --- Close / Back Button --- */
+.close-btn {
+  display: inline-block;
+  margin-bottom: 1rem;
+  padding: 0.4rem 0.8rem;
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.close-btn:hover {
+  background: #ff4b4b;
+}
+
+/* --- Empty State --- */
+.empty-state {
+  font-style: italic;
+  text-align: center;
+  width: 100%;
+  color: #666;
+}
+
+.notes {
+  background: #fff9e6;
+  border-left: 4px solid #ff6b6b;
+  padding: 0.6rem 1rem;
+  margin-bottom: 1rem;
+  line-height: 1.5;
 }
